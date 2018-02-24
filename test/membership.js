@@ -2,7 +2,7 @@
 
 var Membership = artifacts.require("./Membership.sol");
 
-contract('Membership', async (accounts) => {
+contract('Membership - tests for ownership, applying membership, confirm & revoke membership', async (accounts) => {
 
   const account1 = accounts[0]; //0x627306090abaB3A6e1400e9345bC60c78a8BEf57
   const account2 = accounts[1]; //0xf17f52151EbEF6C7334FAD080c5704D77216b732
@@ -210,10 +210,25 @@ contract('Membership', async (accounts) => {
     }
   });
 
+});
+
+contract('Membership - tests for funds transfer', async (accounts) => {
+
+  const account1 = accounts[0]; //0x627306090abaB3A6e1400e9345bC60c78a8BEf57
+  const account2 = accounts[1]; //0xf17f52151EbEF6C7334FAD080c5704D77216b732
+  const account3 = accounts[2]; //0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef
+
+  before(async () => {
+    // runs before all tests in this block
+    let membershipInstance = await Membership.deployed();
+    await membershipInstance.applyForMembership("Malcolm", "Turnbull", "https://gov.au/mturnbull", "https://linkedin.com/mturnbull", "https://twitter.com/mturnbull", {from : account2, value : web3.toWei(1, "ether")});
+    await membershipInstance.applyForMembership("Barnaby", "Joyce", "https://gov.au/bjoyce", "https://linkedin.com/bjoyce", "https://twitter.com/bjoyce", {from : account3, value : web3.toWei(0.1, "ether")});
+  });
+
   it("should not transfer funds to provided address when called by non-owner / unknown address", async () => {
     let membershipInstance = await Membership.deployed();
     try{
-      await membershipInstance.transferFunds(account7, {from : account3});
+      await membershipInstance.transferFunds(account3, {from : account3});
     }catch(error){
       //console.log(error);
       assert.isTrue(error.name == "StatusError", "Transaction did not fail when attempting to transfer funds by a non-owner, status is not error");
@@ -226,48 +241,72 @@ contract('Membership', async (accounts) => {
   it("should transfer funds to provided address when called by owner", async () => {
     let membershipInstance = await Membership.deployed();
     let previousContractBalance = web3.eth.getBalance(membershipInstance.address);
-    let previousAccountBalance = web3.eth.getBalance(account7);
-    await membershipInstance.transferFunds(account7, {from : account2});
+    let previousAccountBalance = web3.eth.getBalance(account3);
+    try{
+        let txn = await membershipInstance.transferFunds(account3, {from : account1});
+        for(let i = 0; i < txn.logs.length; i++) {
+          let log = txn.logs[i];
+          assert.isTrue(log.event == "LogFundsTransfer", "Expected LogFundsTransfer event to be triggerred but found " + log.event + " event instead.");
+        }
+    } catch(error){
+        console.log(error);
+    }
     let currentContractBalance = web3.eth.getBalance(membershipInstance.address);
-    let currentAccountBalance = web3.eth.getBalance(account7);
+    let currentAccountBalance = web3.eth.getBalance(account3);
 
     assert.isTrue(currentContractBalance.toNumber() == 0, "Contract balance is not zero after transfer");
     assert.isTrue(currentAccountBalance.toNumber() == (previousAccountBalance.toNumber() + previousContractBalance.toNumber()), "Account balance is incorrect after transfer");
   });
 
-  it("should not selfdestruct called by non-owner / unknown address", async () => {
-    let membershipInstance = await Membership.deployed();
-    try{
-      await membershipInstance.destroy({from : account3});
-    }catch(error){
-      //console.log(error);
-      assert.isTrue(error.name == "StatusError", "Transaction did not fail when attempting to transfer funds by a non-owner, status is not error");
-      assert.isTrue(error.receipt.status == "0x00", "Transaction did not fail when attempting to transfer funds by a non-owner, status is not failure");
-    }
+  contract('Membership - tests for selfdestruct', async (accounts) => {
+
+    const account1 = accounts[0]; //0x627306090abaB3A6e1400e9345bC60c78a8BEf57
+    const account2 = accounts[1]; //0xf17f52151EbEF6C7334FAD080c5704D77216b732
+    const account3 = accounts[2]; //0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef
+
+    before(async () => {
+      // runs before all tests in this block
+      let membershipInstance = await Membership.deployed();
+      await membershipInstance.applyForMembership("Malcolm", "Turnbull", "https://gov.au/mturnbull", "https://linkedin.com/mturnbull", "https://twitter.com/mturnbull", {from : account2, value : web3.toWei(1, "ether")});
+      await membershipInstance.applyForMembership("Barnaby", "Joyce", "https://gov.au/bjoyce", "https://linkedin.com/bjoyce", "https://twitter.com/bjoyce", {from : account3, value : web3.toWei(0.1, "ether")});
+    });
+
+    it("should not selfdestruct called by non-owner / unknown address", async () => {
+      let membershipInstance = await Membership.deployed();
+      try{
+        await membershipInstance.destroy({from : account3});
+      }catch(error){
+        //console.log(error);
+        assert.isTrue(error.name == "StatusError", "Transaction did not fail when attempting to transfer funds by a non-owner, status is not error");
+        assert.isTrue(error.receipt.status == "0x00", "Transaction did not fail when attempting to transfer funds by a non-owner, status is not failure");
+      }
+    });
+
+    it("should selfdestruct called by owner", async () => {
+      let membershipInstance = await Membership.deployed();
+      let previousOwnerBalance, previousContractBalance, currentContractBalance, currentOwnerBalance;
+      try{
+        previousOwnerBalance =  web3.fromWei(web3.eth.getBalance(account1), "ether");
+        previousContractBalance = web3.fromWei(web3.eth.getBalance(membershipInstance.address), "ether");
+        try{
+            let txn = await membershipInstance.destroy({from : account1});
+            for(let i = 0; i < txn.logs.length; i++) {
+              let log = txn.logs[i];
+              assert.isTrue(log.event == "LogMembershipContractSelfDestruct", "Expected LogMembershipContractSelfDestruct event to be triggerred but found " + log.event + " event instead.");
+            }
+        } catch(error){
+            console.log(error);
+        }
+        currentContractBalance = web3.fromWei(web3.eth.getBalance(membershipInstance.address), "ether");
+        currentOwnerBalance = web3.fromWei(web3.eth.getBalance(account1), "ether");
+      }catch(error){
+        console.log(error);
+      }
+
+      assert.isTrue(currentContractBalance.toNumber() == 0, "Contract balance is not zero after selfdestruct");
+      // Can't verify this because gas is spent by owner to execute the txn
+      // assert.isTrue(currentOwnerBalance.toNumber() == (sum), "Owner account balance is incorrect after selfdestruct");
+    });
+
   });
-
-  // it("should selfdestruct called by owner", async () => {
-  //   let membershipInstance = await Membership.deployed();
-  //   let previousOwnerBalance, previousContractBalance, currentContractBalance, currentOwnerBalance;
-  //   try{
-  //     previousOwnerBalance = web3.eth.getBalance(account2);
-  //     previousContractBalance = web3.eth.getBalance(membershipInstance.address);;
-  //     await membershipInstance.destroy({from : account2});
-  //     currentContractBalance = web3.eth.getBalance(membershipInstance.address);;
-  //     currentOwnerBalance = web3.eth.getBalance(account2);
-  //   }catch(error){
-  //     console.log(error);
-  //   }
-  //   console.log(previousOwnerBalance.toNumber());
-  //   console.log(previousContractBalance.toNumber());
-  //
-  //   console.log(currentContractBalance.toNumber());
-  //   console.log(currentOwnerBalance.toNumber());
-  //
-  //   console.log((previousOwnerBalance.toNumber() + previousContractBalance.toNumber()));
-  //
-  //   assert.isTrue(currentContractBalance.toNumber() == 0, "Contract balance is not zero after selfdestruct");
-  //   assert.isTrue(currentOwnerBalance.toNumber() == (previousOwnerBalance.toNumber() + previousContractBalance.toNumber()), "Owner account balance is incorrect after selfdestruct");
-  // });
-
 });

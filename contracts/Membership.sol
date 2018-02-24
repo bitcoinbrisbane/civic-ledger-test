@@ -30,6 +30,8 @@ contract Membership is Owned {
     event LogMembershipApplied(uint32 applicationId, address indexed owner, address indexed memberAddrs);
     event LogMembershipAdded(uint32 applicationId, uint32 memberId, address indexed owner, address indexed memberAddrs);
     event LogMembershipRevoked(uint32 memberId, address indexed owner, address indexed memberAddrs);
+    event LogMembershipContractSelfDestruct(address indexed _owner);
+    event LogFundsTransfer(address indexed _owner, address indexed _recipient);
 
     /**
     @notice This function is invoked to apply for a membership and requires ether to be sent
@@ -210,6 +212,7 @@ contract Membership is Owned {
     @param _recipient Recipient address
     */
     function transferFunds(address _recipient) public onlyOwner {
+        LogFundsTransfer(owner, _recipient);
         _recipient.transfer(this.balance);
     }
 
@@ -218,6 +221,7 @@ contract Membership is Owned {
             Requires the contract owner to be the executor
     */
     function destroy() public onlyOwner {
+        LogMembershipContractSelfDestruct(owner);
         selfdestruct(owner);
     }
 
