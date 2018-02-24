@@ -86,25 +86,34 @@ contract Membership is Owned {
     @notice This function confirms a pending applicant as a member
             Requires the contract owner to be the executor
     @param _applicationId The application identifier
-    @return _memberId The member identifier
     */
     function addMembership(uint32 _applicationId)
         public
         onlyOwner
-        returns (uint32 _memberId)
     {
         /// verify that the incoming application is pending
         require(!isEmptyString(pendingApplicants[_applicationId].firstName));
+        uint memberIdU256 = memberIds.length + 1;
+        assert(memberIdU256 > memberIds.length);
+        uint32 memberId = uint32(memberIdU256);
 
-        _memberId = uint32(memberIds.length++);
+        Member memory pendingApplicant = pendingApplicants[_applicationId];
 
-        MembershipAdded(_applicationId, _memberId, owner, member.memberAddrs);
+        Member memory member = Member({
+            memberAddrs : pendingApplicant.memberAddrs,
+            firstName : pendingApplicant.firstName,
+            lastName : pendingApplicant.lastName,
+            companyURL : pendingApplicant.companyURL,
+            linkedInURL : pendingApplicant.linkedInURL,
+            twitterURL : pendingApplicant.twitterURL
+        });
 
-        Member memory member = pendingApplicants[_applicationId];
-        members[_memberId] = member;
-        memberIds[_memberId] = _memberId;
+        MembershipAdded(_applicationId, memberId, owner, member.memberAddrs);
 
-        delete pendingApplicants[_applicationId];
+        members[memberId] = member;
+        memberIds.push(memberId);
+
+        /* delete pendingApplicants[_applicationId - 1]; */
     }
 
     /**
@@ -120,7 +129,7 @@ contract Membership is Owned {
         MembershipRevoked(_memberId, owner, member.memberAddrs);
 
         delete members[_memberId];
-        delete memberIds[_memberId];
+        delete memberIds[_memberId - 1];
     }
 
     /**
@@ -147,6 +156,9 @@ contract Membership is Owned {
             string  _twitterURL
         )
     {
+        /// verify that the incoming application is pending
+        require(!isEmptyString(pendingApplicants[_applicationId].firstName));
+
         Member memory pendingApplication = pendingApplicants[_applicationId];
         _memberAddrs = pendingApplication.memberAddrs;
         _firstName = pendingApplication.firstName;
@@ -180,6 +192,9 @@ contract Membership is Owned {
             string  _twitterURL
         )
     {
+        /// verify that the incoming member id is valid
+        require(!isEmptyString(members[_memberId].firstName));
+
         Member memory member = members[_memberId];
         _memberAddrs = member.memberAddrs;
         _firstName = member.firstName;
@@ -187,6 +202,23 @@ contract Membership is Owned {
         _companyURL = member.companyURL;
         _linkedInURL = member.linkedInURL;
         _twitterURL = member.twitterURL;
+    }
+
+    /**
+    @notice This function transfers balance fund to provided _recipient address
+            Requires the contract owner to be the executor
+    @param _recipient Recipient address
+    */
+    function transferFunds(address _recipient) public onlyOwner {
+        _recipient.transfer(this.balance);
+    }
+
+    /**
+    @notice This function will destroy the contract and transfer balance to contract owner
+            Requires the contract owner to be the executor
+    */
+    function destroy() public onlyOwner {
+        selfdestruct(owner);
     }
 
     /**
