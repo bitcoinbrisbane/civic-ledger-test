@@ -57,7 +57,7 @@ contract('Membership', async (accounts) => {
         let log = txn1.logs[i];
         //console.log(log);
         applicationId1 = log.args.applicationId;
-        assert.isTrue(log.event == "MembershipApplied", "Expected MembershipApplied event to be triggerred but found " + log.event + " event instead.");
+        assert.isTrue(log.event == "LogMembershipApplied", "Expected LogMembershipApplied event to be triggerred but found " + log.event + " event instead.");
       }
 
       let txn2 = await membershipInstance.applyForMembership("Barnaby", "Joyce", "https://gov.au/bjoyce", "https://linkedin.com/bjoyce", "https://twitter.com/bjoyce", {from : account5, value : web3.toWei(0.1, "ether")});
@@ -66,7 +66,7 @@ contract('Membership', async (accounts) => {
         let log = txn2.logs[i];
         //console.log(log);
         applicationId2 = log.args.applicationId;
-        assert.isTrue(log.event == "MembershipApplied", "Expected MembershipApplied event to be triggerred but found " + log.event + " event instead.");
+        assert.isTrue(log.event == "LogMembershipApplied", "Expected LogMembershipApplied event to be triggerred but found " + log.event + " event instead.");
       }
 
       let txn3 = await membershipInstance.applyForMembership("Tony", "Abbott", "https://gov.au/tabbott", "https://linkedin.com/tabbott", "https://twitter.com/tabbott", {from : account6, value : web3.toWei(0.01, "ether")});
@@ -75,7 +75,7 @@ contract('Membership', async (accounts) => {
         let log = txn3.logs[i];
         //console.log(log);
         applicationId3 = log.args.applicationId;
-        assert.isTrue(log.event == "MembershipApplied", "Expected MembershipApplied event to be triggerred but found " + log.event + " event instead.");
+        assert.isTrue(log.event == "LogMembershipApplied", "Expected LogMembershipApplied event to be triggerred but found " + log.event + " event instead.");
       }
 
       let errorMsg1 = "The expected application id was " + 1 + " but received id was " + applicationId1;
@@ -125,7 +125,7 @@ contract('Membership', async (accounts) => {
         // console.log(log);
         applicationId = log.args.applicationId;
         memberId = log.args.memberId;
-        assert.isTrue(log.event == "MembershipAdded", "Expected MembershipAdded event to be triggerred but found " + log.event + " event instead.");
+        assert.isTrue(log.event == "LogMembershipAdded", "Expected LogMembershipAdded event to be triggerred but found " + log.event + " event instead.");
       }
       var member1 = await membershipInstance.getMemberDetails.call(1);
       assert.equal(member1[0], "0x0d1d4e623d10f9fba5db95830f7d3839406c6af2", "Expected member addrs to be 0x0d1d4e623d10f9fba5db95830f7d3839406c6af2 but actual is " + member1[0]);
@@ -141,7 +141,7 @@ contract('Membership', async (accounts) => {
         // console.log(log1);
         applicationId2 = log1.args.applicationId;
         memberId2 = log1.args.memberId;
-        assert.isTrue(log1.event == "MembershipAdded", "Expected MembershipAdded event to be triggerred but found " + log1.event + " event instead.");
+        assert.isTrue(log1.event == "LogMembershipAdded", "Expected LogMembershipAdded event to be triggerred but found " + log1.event + " event instead.");
       }
       var member2 = await membershipInstance.getMemberDetails.call(2);
       assert.equal(member2[0], 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544, "Expected member addrs to be 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544 but actual is " + member2[0]);
@@ -189,7 +189,7 @@ contract('Membership', async (accounts) => {
         let log = txn.logs[i];
         // console.log(log);
         memberId = log.args.memberId;
-        assert.isTrue(log.event == "MembershipRevoked", "Expected MembershipRevoked event to be triggerred but found " + log.event + " event instead.");
+        assert.isTrue(log.event == "LogMembershipRevoked", "Expected LogMembershipRevoked event to be triggerred but found " + log.event + " event instead.");
       }
     }catch(error){
       console.log("Error", error);

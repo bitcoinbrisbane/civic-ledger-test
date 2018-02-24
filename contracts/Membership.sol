@@ -27,9 +27,9 @@ contract Membership is Owned {
     uint32[] private memberIds;
     mapping(uint32 => Member) private members;
 
-    event MembershipApplied(uint32 applicationId, address indexed owner, address indexed memberAddrs);
-    event MembershipAdded(uint32 applicationId, uint32 memberId, address indexed owner, address indexed memberAddrs);
-    event MembershipRevoked(uint32 memberId, address indexed owner, address indexed memberAddrs);
+    event LogMembershipApplied(uint32 applicationId, address indexed owner, address indexed memberAddrs);
+    event LogMembershipAdded(uint32 applicationId, uint32 memberId, address indexed owner, address indexed memberAddrs);
+    event LogMembershipRevoked(uint32 memberId, address indexed owner, address indexed memberAddrs);
 
     /**
     @notice This function is invoked to apply for a membership and requires ether to be sent
@@ -75,7 +75,7 @@ contract Membership is Owned {
         uint32 applicationsCount = uint32(applicationIds.length);
         uint32 applicationId = applicationsCount + 1;
 
-        MembershipApplied(applicationId, owner, msg.sender);
+        LogMembershipApplied(applicationId, owner, msg.sender);
 
         pendingApplicants[applicationId] = pendingMember;
 
@@ -108,7 +108,7 @@ contract Membership is Owned {
             twitterURL : pendingApplicant.twitterURL
         });
 
-        MembershipAdded(_applicationId, memberId, owner, member.memberAddrs);
+        LogMembershipAdded(_applicationId, memberId, owner, member.memberAddrs);
 
         members[memberId] = member;
         memberIds.push(memberId);
@@ -126,7 +126,7 @@ contract Membership is Owned {
         require(!isEmptyString(members[_memberId].firstName));
         Member memory member = members[_memberId];
 
-        MembershipRevoked(_memberId, owner, member.memberAddrs);
+        LogMembershipRevoked(_memberId, owner, member.memberAddrs);
 
         delete members[_memberId];
         delete memberIds[_memberId - 1];
