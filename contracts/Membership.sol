@@ -27,9 +27,9 @@ contract Membership is Owned {
     uint32[] private memberIds;
     mapping(uint32 => Member) private members;
 
-    event MembershipApplied(address indexed owner, address indexed memberAddrs);
-    event MembershipAdded(address indexed owner, address indexed memberAddrs);
-    event MembershipRevoked(address indexed owner, address indexed memberAddrs);
+    event MembershipApplied(uint32 applicationId, address indexed owner, address indexed memberAddrs);
+    event MembershipAdded(uint32 applicationId, uint32 memberId, address indexed owner, address indexed memberAddrs);
+    event MembershipRevoked(uint32 memberId, address indexed owner, address indexed memberAddrs);
 
     /**
     @notice This function is invoked to apply for a membership and requires ether to be sent
@@ -39,7 +39,6 @@ contract Membership is Owned {
     @param _companyURL Company URL of the applicant
     @param _linkedInURL Company URL of the applicant
     @param _twitterURL Twitter URL of the applicant
-    @return _applicationId Application id
     */
     function applyForMembership (
         string _firstName,
@@ -50,7 +49,6 @@ contract Membership is Owned {
     )
         public
         payable
-        returns (uint32 _applicationId)
     {
         /// Validate that ether is sent in txn
         require(msg.value > 0);
@@ -74,13 +72,14 @@ contract Membership is Owned {
             twitterURL : _twitterURL
         });
 
-        MembershipApplied(owner, msg.sender);
-
         uint32 applicationsCount = uint32(applicationIds.length);
-        _applicationId = applicationsCount++;
-        pendingApplicants[_applicationId] = pendingMember;
+        uint32 applicationId = applicationsCount + 1;
 
-        applicationIds.push(_applicationId);
+        MembershipApplied(applicationId, owner, msg.sender);
+
+        pendingApplicants[applicationId] = pendingMember;
+
+        applicationIds.push(applicationId);
     }
 
     /**
@@ -99,6 +98,8 @@ contract Membership is Owned {
 
         _memberId = uint32(memberIds.length++);
 
+        MembershipAdded(_applicationId, _memberId, owner, member.memberAddrs);
+
         Member memory member = pendingApplicants[_applicationId];
         members[_memberId] = member;
         memberIds[_memberId] = _memberId;
@@ -116,7 +117,7 @@ contract Membership is Owned {
         require(!isEmptyString(members[_memberId].firstName));
         Member memory member = members[_memberId];
 
-        MembershipRevoked(owner, member.memberAddrs);
+        MembershipRevoked(_memberId, owner, member.memberAddrs);
 
         delete members[_memberId];
         delete memberIds[_memberId];
