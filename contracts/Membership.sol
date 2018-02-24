@@ -113,7 +113,7 @@ contract Membership is Owned {
         members[memberId] = member;
         memberIds.push(memberId);
 
-        /* delete pendingApplicants[_applicationId - 1]; */
+        delete pendingApplicants[_applicationId];
     }
 
     /**
