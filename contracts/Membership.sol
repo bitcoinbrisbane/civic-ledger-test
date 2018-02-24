@@ -57,7 +57,6 @@ contract Membership is Owned {
 
         /// Validate input parameters
         require(
-            (msg.sender != address(0)) &&
             !isEmptyString(_firstName) &&
             !isEmptyString(_lastName) &&
             !isEmptyString(_companyURL) &&

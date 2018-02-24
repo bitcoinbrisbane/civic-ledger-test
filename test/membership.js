@@ -46,6 +46,84 @@ contract('Membership - tests for ownership, applying membership, confirm & revok
     }
   });
 
+  it("should not apply for membership if there are no ethers sent with transaction", async () => {
+    let membershipInstance = await Membership.deployed();
+
+    try{
+      let txn1 = await membershipInstance.applyForMembership("Malcolm", "Turnbull", "https://gov.au/mturnbull", "https://linkedin.com/mturnbull", "https://twitter.com/mturnbull", {from : account4});
+      //console.log(txn1);
+      }catch(error){
+        //console.log(error);
+        assert.isTrue(error.name == "StatusError", "Transaction did not fail when attempting to apply membership without sending ethers, status is not error");
+        assert.isTrue(error.receipt.status == "0x00", "Transaction did not fail when attempting to apply membership without sending ethers, status is not failure");
+      }
+  });
+
+  it("should not apply for membership if First name is empty", async () => {
+    let membershipInstance = await Membership.deployed();
+
+    try{
+      let txn1 = await membershipInstance.applyForMembership("", "Turnbull", "https://gov.au/mturnbull", "https://linkedin.com/mturnbull", "https://twitter.com/mturnbull", {from : account4, value : web3.toWei(1, "ether")});
+      //console.log(txn1);
+      }catch(error){
+        //console.log(error);
+        assert.isTrue(error.name == "StatusError", "Transaction did not fail when attempting to apply membership when first name is empty, status is not error");
+        assert.isTrue(error.receipt.status == "0x00", "Transaction did not fail when attempting to apply membership when first name is empty, status is not failure");
+      }
+  });
+
+  it("should not apply for membership if Last name is empty", async () => {
+    let membershipInstance = await Membership.deployed();
+
+    try{
+      let txn1 = await membershipInstance.applyForMembership("Malcolm", "", "https://gov.au/mturnbull", "https://linkedin.com/mturnbull", "https://twitter.com/mturnbull", {from : account4, value : web3.toWei(1, "ether")});
+      //console.log(txn1);
+      }catch(error){
+        //console.log(error);
+        assert.isTrue(error.name == "StatusError", "Transaction did not fail when attempting to apply membership when last name is empty, status is not error");
+        assert.isTrue(error.receipt.status == "0x00", "Transaction did not fail when attempting to apply membership when last name is empty, status is not failure");
+      }
+  });
+
+  it("should not apply for membership if Company URL is empty", async () => {
+    let membershipInstance = await Membership.deployed();
+
+    try{
+      let txn1 = await membershipInstance.applyForMembership("Malcolm", "Turnbull", "", "https://linkedin.com/mturnbull", "https://twitter.com/mturnbull", {from : account4, value : web3.toWei(1, "ether")});
+      //console.log(txn1);
+      }catch(error){
+        //console.log(error);
+        assert.isTrue(error.name == "StatusError", "Transaction did not fail when attempting to apply membership when company URL is empty, status is not error");
+        assert.isTrue(error.receipt.status == "0x00", "Transaction did not fail when attempting to apply membership when company URL is empty, status is not failure");
+      }
+  });
+
+  it("should not apply for membership if LinkedIn URL is empty", async () => {
+    let membershipInstance = await Membership.deployed();
+
+    try{
+      let txn1 = await membershipInstance.applyForMembership("Malcolm", "Turnbull", "https://gov.au/mturnbull", "", "https://twitter.com/mturnbull", {from : account4, value : web3.toWei(1, "ether")});
+      //console.log(txn1);
+      }catch(error){
+        //console.log(error);
+        assert.isTrue(error.name == "StatusError", "Transaction did not fail when attempting to apply membership when LinkedIn URL is empty, status is not error");
+        assert.isTrue(error.receipt.status == "0x00", "Transaction did not fail when attempting to apply membership when LinkedIn URL is empty, status is not failure");
+      }
+  });
+
+  it("should not apply for membership if Twitter URL is empty", async () => {
+    let membershipInstance = await Membership.deployed();
+
+    try{
+      let txn1 = await membershipInstance.applyForMembership("Malcolm", "Turnbull", "https://gov.au/mturnbull", "https://linkedin.com/mturnbull", "", {from : account4, value : web3.toWei(1, "ether")});
+      //console.log(txn1);
+      }catch(error){
+        //console.log(error);
+        assert.isTrue(error.name == "StatusError", "Transaction did not fail when attempting to apply membership when Twitter URL is empty, status is not error");
+        assert.isTrue(error.receipt.status == "0x00", "Transaction did not fail when attempting to apply membership when Twitter URL is empty, status is not failure");
+      }
+  });
+
   it("should apply for membership", async () => {
     let membershipInstance = await Membership.deployed();
 
