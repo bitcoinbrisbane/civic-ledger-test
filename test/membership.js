@@ -10,6 +10,7 @@ contract('Membership', async (accounts) => {
   const account4 = accounts[3]; //0x821aEa9a577a9b44299B9c15c88cf3087F3b5544
   const account5 = accounts[4]; //0x0d1d4e623D10F9FBA5Db95830F7d3839406C6AF2
   const account6 = accounts[5]; //0x2932b7A2355D6fecc4b5c0B6BD44cC31df247a2e
+  const account7 = accounts[6]; //0x2191eF87E392377ec08E7c08Eb105Ef5448eCED5
 
   // Before this test, the contract owner is account1
   // After this test, the contract owner is account1
@@ -84,6 +85,31 @@ contract('Membership', async (accounts) => {
       assert.equal(applicationId1, 1, errorMsg1);
       assert.equal(applicationId2, 2, errorMsg2);
       assert.equal(applicationId3, 3, errorMsg3);
+
+      var pendingApplicant1 = await membershipInstance.getPendingApplicationDetails.call(1);
+      assert.equal(pendingApplicant1[0], 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544, "Expected member addrs to be 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544 but actual is " + pendingApplicant1[0]);
+      assert.equal(pendingApplicant1[1], "Malcolm", "Expected first name to be Malcolm but actual is " + pendingApplicant1[1]);
+      assert.equal(pendingApplicant1[2], "Turnbull", "Expected last name to be Turnbull but actual is " + pendingApplicant1[2]);
+      assert.equal(pendingApplicant1[3], "https://gov.au/mturnbull", "Expected company URL to be https://gov.au/mturnbull but actual is " + pendingApplicant1[3]);
+      assert.equal(pendingApplicant1[4], "https://linkedin.com/mturnbull", "Expected LinkedIn URL to be https://linkedin.com/mturnbull but actual is " + pendingApplicant1[4]);
+      assert.equal(pendingApplicant1[5], "https://twitter.com/mturnbull", "Expected Twitter URL to be https://twitter.com/mturnbull but actual is " + pendingApplicant1[5]);
+
+      var pendingApplicant2 = await membershipInstance.getPendingApplicationDetails.call(2);
+      assert.equal(pendingApplicant2[0], "0x0d1d4e623d10f9fba5db95830f7d3839406c6af2", "Expected member addrs to be 0x0d1d4e623d10f9fba5db95830f7d3839406c6af2 but actual is " + pendingApplicant2[0]);
+      assert.equal(pendingApplicant2[1], "Barnaby", "Expected first name to be Barnaby but actual is " + pendingApplicant2[1]);
+      assert.equal(pendingApplicant2[2], "Joyce", "Expected last name to be Joyce but actual is " + pendingApplicant2[2]);
+      assert.equal(pendingApplicant2[3], "https://gov.au/bjoyce", "Expected company URL to be https://gov.au/bjoyce but actual is " + pendingApplicant2[3]);
+      assert.equal(pendingApplicant2[4], "https://linkedin.com/bjoyce", "Expected LinkedIn URL to be https://linkedin.com/bjoyce but actual is " + pendingApplicant2[4]);
+      assert.equal(pendingApplicant2[5], "https://twitter.com/bjoyce", "Expected Twitter URL to be https://twitter.com/bjoyce but actual is " + pendingApplicant2[5]);
+
+      var pendingApplicant3 = await membershipInstance.getPendingApplicationDetails.call(3);
+      assert.equal(pendingApplicant3[0], "0x2932b7a2355d6fecc4b5c0b6bd44cc31df247a2e", "Expected member addrs to be 0x2932b7a2355d6fecc4b5c0b6bd44cc31df247a2e but actual is " + pendingApplicant3[0]);
+      assert.equal(pendingApplicant3[1], "Tony", "Expected first name to be Tony but actual is " + pendingApplicant3[1]);
+      assert.equal(pendingApplicant3[2], "Abbott", "Expected last name to be Abbott but actual is " + pendingApplicant3[2]);
+      assert.equal(pendingApplicant3[3], "https://gov.au/tabbott", "Expected company URL to be https://gov.au/tabbott but actual is " + pendingApplicant3[3]);
+      assert.equal(pendingApplicant3[4], "https://linkedin.com/tabbott", "Expected LinkedIn URL to be https://linkedin.com/tabbott but actual is " + pendingApplicant3[4]);
+      assert.equal(pendingApplicant3[5], "https://twitter.com/tabbott", "Expected Twitter URL to be https://twitter.com/tabbott but actual is " + pendingApplicant3[5]);
+
   }catch(error){
     console.log(error);
   }
@@ -101,6 +127,13 @@ contract('Membership', async (accounts) => {
         memberId = log.args.memberId;
         assert.isTrue(log.event == "MembershipAdded", "Expected MembershipAdded event to be triggerred but found " + log.event + " event instead.");
       }
+      var member1 = await membershipInstance.getMemberDetails.call(1);
+      assert.equal(member1[0], "0x0d1d4e623d10f9fba5db95830f7d3839406c6af2", "Expected member addrs to be 0x0d1d4e623d10f9fba5db95830f7d3839406c6af2 but actual is " + member1[0]);
+      assert.equal(member1[1], "Barnaby", "Expected first name to be Barnaby but actual is " + member1[1]);
+      assert.equal(member1[2], "Joyce", "Expected last name to be Joyce but actual is " + member1[2]);
+      assert.equal(member1[3], "https://gov.au/bjoyce", "Expected company URL to be https://gov.au/bjoyce but actual is " + member1[3]);
+      assert.equal(member1[4], "https://linkedin.com/bjoyce", "Expected LinkedIn URL to be https://linkedin.com/bjoyce but actual is " + member1[4]);
+      assert.equal(member1[5], "https://twitter.com/bjoyce", "Expected Twitter URL to be https://twitter.com/bjoyce but actual is " + member1[5]);
 
       let txn1 = await membershipInstance.addMembership(1, {from : account2});
       for(let i = 0; i < txn1.logs.length; i++){
@@ -110,6 +143,14 @@ contract('Membership', async (accounts) => {
         memberId2 = log1.args.memberId;
         assert.isTrue(log1.event == "MembershipAdded", "Expected MembershipAdded event to be triggerred but found " + log1.event + " event instead.");
       }
+      var member2 = await membershipInstance.getMemberDetails.call(2);
+      assert.equal(member2[0], 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544, "Expected member addrs to be 0x821aEa9a577a9b44299B9c15c88cf3087F3b5544 but actual is " + member2[0]);
+      assert.equal(member2[1], "Malcolm", "Expected first name to be Malcolm but actual is " + member2[1]);
+      assert.equal(member2[2], "Turnbull", "Expected last name to be Turnbull but actual is " + member2[2]);
+      assert.equal(member2[3], "https://gov.au/mturnbull", "Expected company URL to be https://gov.au/mturnbull but actual is " + member2[3]);
+      assert.equal(member2[4], "https://linkedin.com/mturnbull", "Expected LinkedIn URL to be https://linkedin.com/mturnbull but actual is " + member2[4]);
+      assert.equal(member2[5], "https://twitter.com/mturnbull", "Expected Twitter URL to be https://twitter.com/mturnbull but actual is " + member2[5]);
+
     }catch(error){
       console.log(error);
     }
@@ -168,5 +209,65 @@ contract('Membership', async (accounts) => {
       assert.isTrue(error.receipt.status == "0x00", "Transaction did not fail when attempting to revoke membership by a non-owner, status is not failure");
     }
   });
+
+  it("should not transfer funds to provided address when called by non-owner / unknown address", async () => {
+    let membershipInstance = await Membership.deployed();
+    try{
+      await membershipInstance.transferFunds(account7, {from : account3});
+    }catch(error){
+      //console.log(error);
+      assert.isTrue(error.name == "StatusError", "Transaction did not fail when attempting to transfer funds by a non-owner, status is not error");
+      assert.isTrue(error.receipt.status == "0x00", "Transaction did not fail when attempting to transfer funds by a non-owner, status is not failure");
+      let currentContractBalance = web3.eth.getBalance(membershipInstance.address);
+      assert.isTrue(currentContractBalance.toNumber() > 0, "Contract balance is zero");;
+    }
+  });
+
+  it("should transfer funds to provided address when called by owner", async () => {
+    let membershipInstance = await Membership.deployed();
+    let previousContractBalance = web3.eth.getBalance(membershipInstance.address);
+    let previousAccountBalance = web3.eth.getBalance(account7);
+    await membershipInstance.transferFunds(account7, {from : account2});
+    let currentContractBalance = web3.eth.getBalance(membershipInstance.address);
+    let currentAccountBalance = web3.eth.getBalance(account7);
+
+    assert.isTrue(currentContractBalance.toNumber() == 0, "Contract balance is not zero after transfer");
+    assert.isTrue(currentAccountBalance.toNumber() == (previousAccountBalance.toNumber() + previousContractBalance.toNumber()), "Account balance is incorrect after transfer");
+  });
+
+  it("should not selfdestruct called by non-owner / unknown address", async () => {
+    let membershipInstance = await Membership.deployed();
+    try{
+      await membershipInstance.destroy({from : account3});
+    }catch(error){
+      //console.log(error);
+      assert.isTrue(error.name == "StatusError", "Transaction did not fail when attempting to transfer funds by a non-owner, status is not error");
+      assert.isTrue(error.receipt.status == "0x00", "Transaction did not fail when attempting to transfer funds by a non-owner, status is not failure");
+    }
+  });
+
+  // it("should selfdestruct called by owner", async () => {
+  //   let membershipInstance = await Membership.deployed();
+  //   let previousOwnerBalance, previousContractBalance, currentContractBalance, currentOwnerBalance;
+  //   try{
+  //     previousOwnerBalance = web3.eth.getBalance(account2);
+  //     previousContractBalance = web3.eth.getBalance(membershipInstance.address);;
+  //     await membershipInstance.destroy({from : account2});
+  //     currentContractBalance = web3.eth.getBalance(membershipInstance.address);;
+  //     currentOwnerBalance = web3.eth.getBalance(account2);
+  //   }catch(error){
+  //     console.log(error);
+  //   }
+  //   console.log(previousOwnerBalance.toNumber());
+  //   console.log(previousContractBalance.toNumber());
+  //
+  //   console.log(currentContractBalance.toNumber());
+  //   console.log(currentOwnerBalance.toNumber());
+  //
+  //   console.log((previousOwnerBalance.toNumber() + previousContractBalance.toNumber()));
+  //
+  //   assert.isTrue(currentContractBalance.toNumber() == 0, "Contract balance is not zero after selfdestruct");
+  //   assert.isTrue(currentOwnerBalance.toNumber() == (previousOwnerBalance.toNumber() + previousContractBalance.toNumber()), "Owner account balance is incorrect after selfdestruct");
+  // });
 
 });
