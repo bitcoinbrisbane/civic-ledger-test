@@ -8,10 +8,10 @@
 #Script to deploy membership contract
 mkdir -p ../build/scripts
 
-echo "var membershipCompiled=`solc --optimize --combined-json abi,bin,interface ../contracts/Membership.sol`" > ../build/scripts/membership.js
+echo "var membershipCompiled=`solc --optimize --combined-json abi,bin,interface ../contracts/Membership.sol`;" > ../build/scripts/membership.js
 
 #Script to attach geth to ganache
-geth --verbosity 3 attach http://127.0.0.1:7545/ << EOF
+geth attach http://127.0.0.1:7545/ << EOF
 
 console.log("loading script ../build/scripts/membership.js");
 
