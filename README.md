@@ -71,6 +71,11 @@ Migrate / Deploy smart contracts
 * Keystore file located at `keyStore\UTC--2018-02-25T11-45-54.567161554Z--16c51fa87f85216606a860f45eb1bc6f363fda00`
 
 Compile and deploy Membership smart contract
+
+```javascript
+echo "var membershipCompiled=`solc --optimize --combined-json abi,bin,interface ../contracts/Membership.sol`;" > ../build/scripts/membership.js
+```
+
 ```javascript
 loadScript("../build/scripts/membership.js");
 var membershipContractAbi = membershipCompiled.contracts['../contracts/Membership.sol:Membership'].abi;
