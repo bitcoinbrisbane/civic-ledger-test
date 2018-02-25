@@ -23,9 +23,9 @@ for this evaluation and has been left as Work in progress.
 * [x] Commit to github
 > Repository link - **https://github.com/palanisn/civic-ledger-test**
 * [x] Deploy to rinkeby
-> The contract is deployed to the Rinkeby test net at *0x5afe61f2c0565b4756c9cd1c55262d4a4a22b783*, transaction hash **0x4188e2c373998d80c1cb08a2ced28d22150caa767f5680171e508555ac615a06**
+> The contract is deployed to the Rinkeby test net at *[0x5afe61f2c0565b4756c9cd1c55262d4a4a22b783](https://rinkeby.etherscan.io/address/0x5afe61f2c0565b4756c9cd1c55262d4a4a22b783)*, transaction hash **[0x4188e2c373998d80c1cb08a2ced28d22150caa767f5680171e508555ac615a06](https://rinkeby.etherscan.io/tx/0x4188e2c373998d80c1cb08a2ced28d22150caa767f5680171e508555ac615a06)**
 * [x] Share link and transaction ID when done
-> The contract is deployed to the Rinkeby test net at *0x5afe61f2c0565b4756c9cd1c55262d4a4a22b783*, transaction hash **0x4188e2c373998d80c1cb08a2ced28d22150caa767f5680171e508555ac615a06**
+> The contract is deployed to the Rinkeby test net at *[0x5afe61f2c0565b4756c9cd1c55262d4a4a22b783](https://rinkeby.etherscan.io/address/0x5afe61f2c0565b4756c9cd1c55262d4a4a22b783)*, transaction hash **[0x4188e2c373998d80c1cb08a2ced28d22150caa767f5680171e508555ac615a06](https://rinkeby.etherscan.io/tx/0x4188e2c373998d80c1cb08a2ced28d22150caa767f5680171e508555ac615a06)**
 
 The following data has been setup in the smart contract
 
@@ -66,7 +66,7 @@ Migrate / Deploy smart contracts
 
 >*Note:* Only contract owner is able to confirm / revoke membership applications
 
-* Public address `0x16c51fa87f85216606a860f45eb1bc6f363fda00`
+* Public address [0x16c51fa87f85216606a860f45eb1bc6f363fda00](https://rinkeby.etherscan.io/address/0x16c51fa87f85216606a860f45eb1bc6f363fda00)
 * Password `secret`
 * Keystore file located at `keyStore\UTC--2018-02-25T11-45-54.567161554Z--16c51fa87f85216606a860f45eb1bc6f363fda00`
 
