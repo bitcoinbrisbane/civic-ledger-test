@@ -12,6 +12,10 @@ The Member’s properties include
 Members can apply with an Ethereum payment.
 
 ## Evaluation criteria
+
+The app has been built using the truffle react box. Integrating the smart contracts to a full fledged DApp is out of scope
+for this evaluation and has been left as Work in progress.
+
 * [x] Create truffle unit tests
 > Tests are located in **test/** directory
 * [x] Bash scripts
@@ -19,18 +23,18 @@ Members can apply with an Ethereum payment.
 * [x] Commit to github
 > Repository link - **https://github.com/palanisn/civic-ledger-test**
 * [x] Deploy to rinkeby
-> The contract is deployed to the Rinkeby test net at *contractAddress*, transaction hash **txnHash**
+> The contract is deployed to the Rinkeby test net at *0x5afe61f2c0565b4756c9cd1c55262d4a4a22b783*, transaction hash **0x4188e2c373998d80c1cb08a2ced28d22150caa767f5680171e508555ac615a06**
 * [x] Share link and transaction ID when done
-> The contract is deployed to the Rinkeby test net at *contractAddress*, transaction hash **txnHash**
+> The contract is deployed to the Rinkeby test net at *0x5afe61f2c0565b4756c9cd1c55262d4a4a22b783*, transaction hash **0x4188e2c373998d80c1cb08a2ced28d22150caa767f5680171e508555ac615a06**
 
 The following data has been setup in the smart contract
 
-| First name | Last name | Company URL | LinkedIn URL | Twitter URL | Status |
-| :--------: | :--------:| :---------: | :---------:  | :---------: | :----: |
-| Malcolm | Turnbull | https://gov.au/mturnbull | https://linkedin.com/mturnbull | https://twitter.com/mturnbull |
-| Tony | Abbott | https://gov.au/tabbott | https://linkedin.com/tabbott | https://twitter.com/tabbott |
-| Barnaby | Joyce | https://gov.au/bjoyce | https://linkedin.com/bjoyce | https://twitter.com/bjoyce |
-| Gladys | Berejiklian | https://gov.au/gberejiklian | https://linkedin.com/gberejiklian | https://twitter.com/gberejiklian |
+| First name | Last name | Company URL | LinkedIn URL | Twitter URL | Status | Application Id |
+| :--------: | :--------:| :---------: | :---------:  | :---------: | :----: | :---------: |
+| Malcolm | Turnbull | https://gov.au/mturnbull | https://linkedin.com/mturnbull | https://twitter.com/mturnbull | Applied | 1 |
+| Tony | Abbott | https://gov.au/tabbott | https://linkedin.com/tabbott | https://twitter.com/tabbott | Applied | 2 |
+| Barnaby | Joyce | https://gov.au/bjoyce | https://linkedin.com/bjoyce | https://twitter.com/bjoyce | Applied | 3 |
+| Gladys | Berejiklian | https://gov.au/gberejiklian | https://linkedin.com/gberejiklian | https://twitter.com/gberejiklian | Applied | 4 |
 
 ## Tools used
 * Truffle
@@ -58,14 +62,17 @@ Migrate / Deploy smart contracts
 
 >*Note:* If deploying to Rinkeby, verify configuration settings in **bashScripts/settings.conf**
 
-### Account details
+### Contract owner account details
+
+>*Note:* Only contract owner is able to confirm / revoke membership applications
+
 * Public address `0x16c51fa87f85216606a860f45eb1bc6f363fda00`
 * Password `secret`
 * Keystore file located at `keyStore\UTC--2018-02-25T11-45-54.567161554Z--16c51fa87f85216606a860f45eb1bc6f363fda00`
 
 Compile and deploy Membership smart contract
 ```javascript
-loadScript("/Users/palanisn/workspace/solidity/civic-ledger-test/build/scripts/membership.js");
+loadScript("../build/scripts/membership.js");
 var membershipContractAbi = membershipCompiled.contracts['../contracts/Membership.sol:Membership'].abi;
 var membershipContract = web3.eth.contract(JSON.parse(membershipContractAbi));
 var membershipBinCode = "0x" + membershipCompiled.contracts['../contracts/Membership.sol:Membership'].bin;
@@ -78,7 +85,7 @@ var membershipContractAddrs = web3.eth.getTransactionReceipt(membershipInstance.
 Interact with membership contract
 Apply for membership
 ```javascript
-var membershipContractAddrs = "0xd2732ffd3651782b7ba8dcc9ac443f2fb0941806";
+var membershipContractAddrs = "0x5afe61f2c0565b4756c9cd1c55262d4a4a22b783";
 var membership = membershipContract.at(membershipContractAddrs);
 
 var membershipAppliedEvent = membership.LogMembershipApplied(function(error, result) {
@@ -89,8 +96,8 @@ var membershipAppliedEvent = membership.LogMembershipApplied(function(error, res
   }
 });
 
-personal.unlockAccount(eth.accounts[1], "secret");
-var application = membership.applyForMembership.sendTransaction("John", "Rambo", "https://jrambo.com", "https://linkedin.com/jrambo", "https://twitter.com/jrambo", {from : eth.accounts[1], value : web3.toWei(0.1, "ether"), gas : 6700000, gasPrice: web3.toWei("30", "gwei")});
+personal.unlockAccount(eth.accounts[0], "secret");
+var application = membership.applyForMembership.sendTransaction("John", "Rambo", "https://jrambo.com", "https://linkedin.com/jrambo", "https://twitter.com/jrambo", {from : eth.accounts[0], value : web3.toWei(0.1, "ether"), gas : 6700000, gasPrice: web3.toWei("30", "gwei")});
 var txnReceipt = web3.eth.getTransactionReceipt(application);
 
 membershipAppliedEvent.stopWatching();
@@ -98,7 +105,7 @@ membershipAppliedEvent.stopWatching();
 
 Confirm membership
 ```javascript
-var membershipContractAddrs = "0xd2732ffd3651782b7ba8dcc9ac443f2fb0941806";
+var membershipContractAddrs = "0x5afe61f2c0565b4756c9cd1c55262d4a4a22b783";
 var membership = membershipContract.at(membershipContractAddrs);
 
 var membershipAddedEvent = membership.LogMembershipAdded(function(error, result) {
@@ -110,8 +117,8 @@ var membershipAddedEvent = membership.LogMembershipAdded(function(error, result)
   }
 });
 
-personal.unlockAccount(eth.accounts[1], "secret");
-var confirmation = membership.addMembership.sendTransaction(1, {from : eth.accounts[1], gas : 6700000, gasPrice: web3.toWei("30", "gwei")});
+personal.unlockAccount(eth.accounts[0], "secret");
+var confirmation = membership.addMembership.sendTransaction(1, {from : eth.accounts[0], gas : 6700000, gasPrice: web3.toWei("30", "gwei")});
 var txnReceipt = web3.eth.getTransactionReceipt(confirmation);
 
 membershipAddedEvent.stopWatching();
@@ -119,7 +126,7 @@ membershipAddedEvent.stopWatching();
 
 Revoke membership
 ```javascript
-var membershipContractAddrs = "0xd2732ffd3651782b7ba8dcc9ac443f2fb0941806";
+var membershipContractAddrs = "0x5afe61f2c0565b4756c9cd1c55262d4a4a22b783";
 var membership = membershipContract.at(membershipContractAddrs);
 
 var membershipRevokedEvent = membership.LogMembershipRevoked(function(error, result) {
@@ -130,8 +137,8 @@ var membershipRevokedEvent = membership.LogMembershipRevoked(function(error, res
   }
 });
 
-personal.unlockAccount(eth.accounts[1], "secret");
-var revoke = membership.revokeMembership.sendTransaction(1, {from : eth.accounts[1], gas : 6700000, gasPrice: web3.toWei("30", "gwei")});
+personal.unlockAccount(eth.accounts[0], "secret");
+var revoke = membership.revokeMembership.sendTransaction(1, {from : eth.accounts[0], gas : 6700000, gasPrice: web3.toWei("30", "gwei")});
 var txnReceipt = web3.eth.getTransactionReceipt(revoke);
 
 membershipRevokedEvent.stopWatching();
@@ -147,4 +154,5 @@ membershipRevokedEvent.stopWatching();
 * [x] Shell script for deployment
 * [x] Shell script for interaction / use cases
 * [x] Deploy to Rinkeby & test
-* [ ] Integrate into React app
+* [ ] Integrate into React app - Integrating the smart contracts to a full fledged DApp is out of scope
+for this evaluation and has been left as Work in progress.
