@@ -9,4 +9,4 @@
 * [x] Shell script for deployment
 * [x] Shell script for interaction / use cases
 * [ ] Deploy to Rinkeby & test
-* [ ] Improve React app
+* [ ] Integrate into React app
