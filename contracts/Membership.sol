@@ -20,11 +20,13 @@ contract Membership is Owned {
         string twitterURL;
     }
 
-    uint32[] private applicationIds;
+    uint32[] public applicationIds;
+
+    uint32[] public pendingApplicationIds;
     /// Mapping application id to Applicant details
     mapping(uint32 => Member) private pendingApplicants;
 
-    uint32[] private memberIds;
+    uint32[] public memberIds;
     mapping(uint32 => Member) private members;
 
     event LogMembershipApplied(uint32 applicationId, address indexed owner, address indexed memberAddrs);
@@ -78,6 +80,7 @@ contract Membership is Owned {
 
         LogMembershipApplied(applicationId, owner, msg.sender);
 
+        pendingApplicationIds.push(applicationId);
         pendingApplicants[applicationId] = pendingMember;
 
         applicationIds.push(applicationId);
@@ -115,6 +118,7 @@ contract Membership is Owned {
         memberIds.push(memberId);
 
         delete pendingApplicants[_applicationId];
+        delete pendingApplicationIds[_applicationId - 1];
     }
 
     /**
@@ -203,6 +207,42 @@ contract Membership is Owned {
         _companyURL = member.companyURL;
         _linkedInURL = member.linkedInURL;
         _twitterURL = member.twitterURL;
+    }
+
+    /**
+    @notice This function returns the number of applications that are pending
+    @return _count Pending application count
+    */
+    function getPendingApplicationCount()
+        public
+        view
+        returns (uint _count)
+    {
+        _count = pendingApplicationIds.length;
+    }
+
+    /**
+    @notice This function returns the number of members
+    @return _count Total member count
+    */
+    function getMemberCount()
+        public
+        view
+        returns (uint _count)
+    {
+        _count = memberIds.length;
+    }
+
+    /**
+    @notice This function returns the number of applications
+    @return _count Total applicants count
+    */
+    function getApplicationsCount()
+        public
+        view
+        returns (uint _count)
+    {
+        _count = applicationIds.length;
     }
 
     /**
