@@ -50,7 +50,7 @@ var membership = membershipContract.at(contractAddrs);
 console.log("Applying membership with details..");
 
 membership.applyForMembership.sendTransaction(firstName, lastName, companyURL, linkedInURL, twitterURL,
-    {from : eth.accounts[0], value : web3.toWei(0.1, "ether"), gas : 300000}, function(error, txnHash) {
+    {from : eth.accounts[0], value : web3.toWei(0.1, "ether"), gas : 500000}, function(error, txnHash) {
       if(!error){
         web3.eth.getTransactionReceipt(txnHash, function(error, receipt){
           if(!error) {
